@@ -1,7 +1,7 @@
 package io.github.zeroone3010.hue2influx;
 
-import com.github.zeroone3010.yahueapi.Hue;
-import com.github.zeroone3010.yahueapi.HueBridgeProtocol;
+import io.github.zeroone3010.yahueapi.Hue;
+import io.github.zeroone3010.yahueapi.HueBridgeProtocol;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
