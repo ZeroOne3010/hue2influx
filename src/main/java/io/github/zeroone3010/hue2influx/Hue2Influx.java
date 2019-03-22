@@ -2,6 +2,7 @@ package io.github.zeroone3010.hue2influx;
 
 import io.github.zeroone3010.yahueapi.Hue;
 import io.github.zeroone3010.yahueapi.HueBridgeProtocol;
+import io.github.zeroone3010.yahueapi.Light;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
@@ -23,7 +24,8 @@ public class Hue2Influx {
     final Hue hue = new Hue(HueBridgeProtocol.UNVERIFIED_HTTPS, ip, apiKey);
     final Map<String, Double> brightnessByRoom = hue.getRooms().stream()
       .map(room -> new Pair(room.getName(), room.getLights().stream()
-        .filter(light -> light.isOn())
+        .filter(Light::isOn)
+        .filter(Light::isReachable)
         .mapToInt(light -> light.getState().getBri())
         .average()
       ))
