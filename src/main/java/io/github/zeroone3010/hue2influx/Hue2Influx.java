@@ -13,15 +13,14 @@ import java.util.OptionalDouble;
 import static java.util.stream.Collectors.toMap;
 
 public class Hue2Influx {
-  public static void main(final String... args) {
-    final String ip = args[0];
-    final String apiKey = args[1];
-    final String influxUrl = args[2];
-    final String influxUserName = args[3];
-    final String influxPassword = args[4];
-    final String influxDatabase = args[5];
+  private final Hue2InfluxConfiguration configuration;
 
-    final Hue hue = new Hue(HueBridgeProtocol.UNVERIFIED_HTTPS, ip, apiKey);
+  public Hue2Influx(final Hue2InfluxConfiguration configuration) {
+    this.configuration = configuration;
+  }
+
+  public void run() {
+    final Hue hue = new Hue(HueBridgeProtocol.UNVERIFIED_HTTPS, configuration.getHueIp(), configuration.getHueApiKey());
     final Map<String, Double> brightnessByRoom = hue.getRooms().stream()
       .map(room -> new Pair(room.getName(), room.getLights().stream()
         .filter(Light::isOn)
@@ -31,8 +30,9 @@ public class Hue2Influx {
       ))
       .collect(toMap(Pair::getRoom, p -> p.getBrightness().orElse(0d)));
 
-    try (final InfluxDB influxDb = InfluxDBFactory.connect(influxUrl, influxUserName, influxPassword)
-      .setDatabase(influxDatabase).setRetentionPolicy("")) {
+    try (final InfluxDB influxDb = InfluxDBFactory
+      .connect(configuration.getInfluxUrl(), configuration.getInfluxUserName(), configuration.getInfluxPassword())
+      .setDatabase(configuration.getInfluxDatabase()).setRetentionPolicy("")) {
       brightnessByRoom.entrySet().stream()
         .map(e -> Point.measurement("hue_measurements")
           .tag("room", e.getKey())
@@ -42,6 +42,19 @@ public class Hue2Influx {
           influxDb.write(point);
         });
     }
+  }
+
+  public static void main(final String... args) {
+    final Hue2InfluxConfiguration configuration = new Hue2InfluxConfiguration();
+    configuration.setHueIp(args[0]);
+    configuration.setHueApiKey(args[1]);
+    configuration.setInfluxUrl(args[2]);
+    configuration.setInfluxUserName(args[3]);
+    configuration.setInfluxPassword(args[4]);
+    configuration.setInfluxDatabase(args[5]);
+
+    final Hue2Influx hue2Influx = new Hue2Influx(configuration);
+    hue2Influx.run();
   }
 
 
