@@ -9,16 +9,20 @@ import org.influxdb.dto.Point;
 
 import java.util.Map;
 import java.util.OptionalDouble;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.stream.Collectors.toMap;
 
-public class Hue2Influx {
+public class Hue2Influx implements Runnable {
   private final Hue2InfluxConfiguration configuration;
 
   public Hue2Influx(final Hue2InfluxConfiguration configuration) {
     this.configuration = configuration;
   }
 
+  @Override
   public void run() {
     final Hue hue = new Hue(HueBridgeProtocol.UNVERIFIED_HTTPS, configuration.getHueIp(), configuration.getHueApiKey());
     final Map<String, Double> brightnessByRoom = hue.getRooms().stream()
@@ -54,7 +58,9 @@ public class Hue2Influx {
     configuration.setInfluxDatabase(args[5]);
 
     final Hue2Influx hue2Influx = new Hue2Influx(configuration);
-    hue2Influx.run();
+
+    final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    scheduler.scheduleWithFixedDelay(hue2Influx, 0L, 10L, TimeUnit.SECONDS);
   }
 
 
