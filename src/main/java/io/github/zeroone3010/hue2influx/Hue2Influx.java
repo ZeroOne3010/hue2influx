@@ -26,9 +26,8 @@ public class Hue2Influx implements Runnable {
     final Hue hue = new Hue(HueBridgeProtocol.UNVERIFIED_HTTPS, configuration.getHueIp(), configuration.getHueApiKey());
     final Map<String, Double> brightnessByRoom = hue.getRooms().stream()
       .map(room -> new Pair(room.getName(), room.getLights().stream()
-        .filter(Light::isOn)
         .filter(Light::isReachable)
-        .mapToInt(light -> light.getState().getBri())
+        .mapToInt(light -> light.isOn() ? light.getState().getBri() : 0)
         .average()
       ))
       .collect(toMap(Pair::getRoom, p -> p.getBrightness().orElse(0d)));
