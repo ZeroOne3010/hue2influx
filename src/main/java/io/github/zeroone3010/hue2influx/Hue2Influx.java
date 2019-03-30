@@ -3,9 +3,6 @@ package io.github.zeroone3010.hue2influx;
 import io.github.zeroone3010.yahueapi.Hue;
 import io.github.zeroone3010.yahueapi.HueBridgeProtocol;
 import io.github.zeroone3010.yahueapi.Light;
-import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
-import org.influxdb.dto.Point;
 
 import java.util.Map;
 import java.util.OptionalDouble;
@@ -17,9 +14,11 @@ import static java.util.stream.Collectors.toMap;
 
 public class Hue2Influx implements Runnable {
   private final Hue2InfluxConfiguration configuration;
+  private final InfluxService influxService;
 
   public Hue2Influx(final Hue2InfluxConfiguration configuration) {
     this.configuration = configuration;
+    this.influxService = new InfluxService(configuration);
   }
 
   @Override
@@ -34,18 +33,7 @@ public class Hue2Influx implements Runnable {
       ))
       .collect(toMap(Pair::getRoom, p -> p.getBrightness().orElse(0d)));
 
-    try (final InfluxDB influxDb = InfluxDBFactory
-      .connect(configuration.getInfluxUrl(), configuration.getInfluxUserName(), configuration.getInfluxPassword())
-      .setDatabase(configuration.getInfluxDatabase()).setRetentionPolicy("")) {
-      brightnessByRoom.entrySet().stream()
-        .map(e -> Point.measurement("hue_measurements")
-          .tag("room", e.getKey())
-          .addField("brightness", e.getValue()).build())
-        .forEach(point -> {
-          System.out.println(point);
-          influxDb.write(point);
-        });
-    }
+    influxService.store(brightnessByRoom);
   }
 
   public static void main(final String... args) {
