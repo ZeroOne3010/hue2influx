@@ -5,6 +5,7 @@ import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class InfluxService {
   private Hue2InfluxConfiguration configuration;
@@ -16,11 +17,13 @@ public class InfluxService {
   void store(final Map<String, Double> brightnessByRoom) {
     try (final InfluxDB influxDb = InfluxDBFactory
       .connect(configuration.getInfluxUrl(), configuration.getInfluxUserName(), configuration.getInfluxPassword())
-      .setDatabase(configuration.getInfluxDatabase()).setRetentionPolicy("")) {
+      .setDatabase(configuration.getInfluxDatabase()).setRetentionPolicy("").enableBatch()) {
       brightnessByRoom.entrySet().stream()
         .map(e -> Point.measurement("hue_measurements")
           .tag("room", e.getKey())
-          .addField("brightness", e.getValue()).build())
+          .addField("brightness", e.getValue())
+          .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+          .build())
         .forEach(point -> {
           System.out.println(point);
           influxDb.write(point);
