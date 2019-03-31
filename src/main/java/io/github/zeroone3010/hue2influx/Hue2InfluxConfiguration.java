@@ -37,7 +37,7 @@ public class Hue2InfluxConfiguration {
     return influxUserName;
   }
 
-  public void setInfluxUserName(String influxUserName) {
+  public void setInfluxUsername(String influxUserName) {
     this.influxUserName = influxUserName;
   }
 

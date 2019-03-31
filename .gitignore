@@ -1,3 +1,5 @@
+hue2influx.properties
+
 ### Intellij ###
 .idea/
 *.iml
