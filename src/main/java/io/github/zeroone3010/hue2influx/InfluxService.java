@@ -25,10 +25,7 @@ public class InfluxService {
           .addField("brightness", e.getValue())
           .time(currentTime, TimeUnit.MILLISECONDS)
           .build())
-        .forEach(point -> {
-          System.out.println(point);
-          influxDb.write(point);
-        });
+        .forEach(influxDb::write);
     }
   }
 }
