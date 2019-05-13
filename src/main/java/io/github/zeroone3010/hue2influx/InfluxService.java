@@ -18,11 +18,12 @@ public class InfluxService {
     try (final InfluxDB influxDb = InfluxDBFactory
       .connect(configuration.getInfluxUrl(), configuration.getInfluxUserName(), configuration.getInfluxPassword())
       .setDatabase(configuration.getInfluxDatabase()).setRetentionPolicy("").enableBatch()) {
+      final long currentTime = System.currentTimeMillis();
       brightnessByRoom.entrySet().stream()
         .map(e -> Point.measurement("hue_measurements")
           .tag("room", e.getKey())
           .addField("brightness", e.getValue())
-          .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+          .time(currentTime, TimeUnit.MILLISECONDS)
           .build())
         .forEach(point -> {
           System.out.println(point);
