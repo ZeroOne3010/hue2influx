@@ -29,7 +29,7 @@ public class Hue2Influx implements Runnable {
     final Hue2Influx hue2Influx = new Hue2Influx(configuration);
 
     final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    scheduler.scheduleWithFixedDelay(hue2Influx, 0L, 10L, TimeUnit.SECONDS);
+    scheduler.scheduleWithFixedDelay(hue2Influx, 0L, configuration.getUpdateIntervalSeconds(), TimeUnit.SECONDS);
   }
 
   private static Hue2InfluxConfiguration configurationLoader(final String file) {
@@ -43,6 +43,8 @@ public class Hue2Influx implements Runnable {
       configuration.setInfluxUsername(properties.getProperty("influx.username"));
       configuration.setInfluxPassword(properties.getProperty("influx.password"));
       configuration.setInfluxDatabase(properties.getProperty("influx.database"));
+      configuration.setUpdateIntervalSeconds(Long.valueOf(properties.getProperty("updateIntervalSeconds",
+        String.valueOf(Hue2InfluxConfiguration.DEFAULT_UPDATE_INTERVAL_SECONDS))));
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
