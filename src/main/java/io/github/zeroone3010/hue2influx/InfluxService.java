@@ -16,7 +16,7 @@ public class InfluxService {
 
   void store(final Map<String, Double> brightnessByRoom) {
     try (final InfluxDB influxDb = InfluxDBFactory
-      .connect(configuration.getInfluxUrl(), configuration.getInfluxUserName(), configuration.getInfluxPassword())
+      .connect(configuration.getInfluxUrl(), configuration.getInfluxUsername(), configuration.getInfluxPassword())
       .setDatabase(configuration.getInfluxDatabase()).setRetentionPolicy("").enableBatch()) {
       final long currentTime = System.currentTimeMillis();
       brightnessByRoom.entrySet().stream()

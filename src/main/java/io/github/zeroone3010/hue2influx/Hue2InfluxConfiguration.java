@@ -7,7 +7,7 @@ public class Hue2InfluxConfiguration {
   private String hueApiKey;
 
   private String influxUrl;
-  private String influxUserName;
+  private String influxUsername;
   private String influxPassword;
   private String influxDatabase;
 
@@ -37,12 +37,12 @@ public class Hue2InfluxConfiguration {
     this.influxUrl = influxUrl;
   }
 
-  public String getInfluxUserName() {
-    return influxUserName;
+  public String getInfluxUsername() {
+    return influxUsername;
   }
 
-  public void setInfluxUsername(String influxUserName) {
-    this.influxUserName = influxUserName;
+  public void setInfluxUsername(String influxUsername) {
+    this.influxUsername = influxUsername;
   }
 
   public String getInfluxPassword() {
