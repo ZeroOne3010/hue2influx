@@ -1,6 +1,9 @@
 package io.github.zeroone3010.hue2influx;
 
+import java.time.temporal.ChronoUnit;
+
 public class Hue2InfluxConfiguration {
+  static final long DEFAULT_FORCE_UPDATE_INTERVAL_SECONDS = ChronoUnit.HOURS.getDuration().getSeconds();
   static final long DEFAULT_UPDATE_INTERVAL_SECONDS = 10L;
 
   private String hueIp;
@@ -12,6 +15,7 @@ public class Hue2InfluxConfiguration {
   private String influxDatabase;
 
   private Long updateIntervalSeconds;
+  private Long forceUpdateIntervalSeconds;
 
   public String getHueIp() {
     return hueIp;
@@ -67,5 +71,13 @@ public class Hue2InfluxConfiguration {
 
   public void setUpdateIntervalSeconds(Long updateIntervalSeconds) {
     this.updateIntervalSeconds = updateIntervalSeconds;
+  }
+
+  public Long getForceUpdateIntervalSeconds() {
+    return forceUpdateIntervalSeconds;
+  }
+
+  public void setForceUpdateIntervalSeconds(Long forceUpdateIntervalSeconds) {
+    this.forceUpdateIntervalSeconds = forceUpdateIntervalSeconds;
   }
 }

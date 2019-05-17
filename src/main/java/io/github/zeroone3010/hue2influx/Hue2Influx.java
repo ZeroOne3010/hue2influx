@@ -1,9 +1,19 @@
 package io.github.zeroone3010.hue2influx;
 
+import io.github.zeroone3010.hue2influx.service.HueService;
+import io.github.zeroone3010.hue2influx.service.InfluxService;
+import io.github.zeroone3010.hue2influx.service.ServiceFactory;
+import io.github.zeroone3010.hue2influx.service.SingletonFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,20 +23,35 @@ public class Hue2Influx implements Runnable {
   private final InfluxService influxService;
   private final HueService hueService;
 
-  public Hue2Influx(final ServiceFactory serviceFactory) {
+  private final long forceUpdateSeconds;
+
+  private long previousSampleTimestamp = 0L;
+  private Map<String, Double> previousBrightnessByRoom = new HashMap<>();
+
+  public Hue2Influx(final ServiceFactory serviceFactory, final long forceUpdateSeconds) {
     this.influxService = serviceFactory.influxService();
     this.hueService = serviceFactory.hueService();
+    this.forceUpdateSeconds = forceUpdateSeconds;
   }
 
   @Override
   public void run() {
     final Map<String, Double> brightnessByRoom = hueService.getBrightnessByRoom();
-    influxService.store(brightnessByRoom);
+    final long currentTime = Clock.systemDefaultZone().millis();
+
+    final long secondsSincePrevious = Duration.ofMillis(currentTime - previousSampleTimestamp).get(ChronoUnit.SECONDS);
+    if (!Objects.equals(brightnessByRoom, previousBrightnessByRoom)
+      || secondsSincePrevious >= forceUpdateSeconds) {
+      influxService.store(brightnessByRoom);
+      previousSampleTimestamp = currentTime;
+    }
+    previousBrightnessByRoom = brightnessByRoom;
   }
 
   public static void main(final String... args) {
     final Hue2InfluxConfiguration configuration = configurationLoader(args[0]);
-    final Hue2Influx hue2Influx = new Hue2Influx(new SingletonFactory(configuration));
+    final Hue2Influx hue2Influx = new Hue2Influx(new SingletonFactory(configuration),
+      configuration.getForceUpdateIntervalSeconds());
 
     final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     scheduler.scheduleWithFixedDelay(hue2Influx, 0L, configuration.getUpdateIntervalSeconds(), TimeUnit.SECONDS);
@@ -45,6 +70,8 @@ public class Hue2Influx implements Runnable {
       configuration.setInfluxDatabase(properties.getProperty("influx.database"));
       configuration.setUpdateIntervalSeconds(Long.valueOf(properties.getProperty("updateIntervalSeconds",
         String.valueOf(Hue2InfluxConfiguration.DEFAULT_UPDATE_INTERVAL_SECONDS))));
+      configuration.setForceUpdateIntervalSeconds(Long.valueOf(properties.getProperty("forceUpdateIntervalSeconds",
+        String.valueOf(Hue2InfluxConfiguration.DEFAULT_FORCE_UPDATE_INTERVAL_SECONDS))));
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
