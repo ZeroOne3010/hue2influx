@@ -13,9 +13,9 @@ public class Hue2Influx implements Runnable {
   private final InfluxService influxService;
   private final HueService hueService;
 
-  public Hue2Influx(final Hue2InfluxConfiguration configuration) {
-    this.influxService = new InfluxService(configuration);
-    this.hueService = new HueService(configuration);
+  public Hue2Influx(final ServiceFactory serviceFactory) {
+    this.influxService = serviceFactory.influxService();
+    this.hueService = serviceFactory.hueService();
   }
 
   @Override
@@ -26,7 +26,7 @@ public class Hue2Influx implements Runnable {
 
   public static void main(final String... args) {
     final Hue2InfluxConfiguration configuration = configurationLoader(args[0]);
-    final Hue2Influx hue2Influx = new Hue2Influx(configuration);
+    final Hue2Influx hue2Influx = new Hue2Influx(new SingletonFactory(configuration));
 
     final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     scheduler.scheduleWithFixedDelay(hue2Influx, 0L, configuration.getUpdateIntervalSeconds(), TimeUnit.SECONDS);

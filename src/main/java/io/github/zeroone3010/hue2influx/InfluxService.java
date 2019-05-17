@@ -1,31 +1,7 @@
 package io.github.zeroone3010.hue2influx;
 
-import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
-import org.influxdb.dto.Point;
-
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-public class InfluxService {
-  private Hue2InfluxConfiguration configuration;
-
-  public InfluxService(final Hue2InfluxConfiguration configuration) {
-    this.configuration = configuration;
-  }
-
-  void store(final Map<String, Double> brightnessByRoom) {
-    try (final InfluxDB influxDb = InfluxDBFactory
-      .connect(configuration.getInfluxUrl(), configuration.getInfluxUsername(), configuration.getInfluxPassword())
-      .setDatabase(configuration.getInfluxDatabase()).setRetentionPolicy("").enableBatch()) {
-      final long currentTime = System.currentTimeMillis();
-      brightnessByRoom.entrySet().stream()
-        .map(e -> Point.measurement("hue_measurements")
-          .tag("room", e.getKey())
-          .addField("brightness", e.getValue())
-          .time(currentTime, TimeUnit.MILLISECONDS)
-          .build())
-        .forEach(influxDb::write);
-    }
-  }
+public interface InfluxService {
+  void store(Map<String, Double> brightnessByRoom);
 }
