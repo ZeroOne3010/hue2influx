@@ -19,6 +19,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import io.github.zeroone3010.hue2influx.service.HueService;
+import io.github.zeroone3010.hue2influx.service.InfluxService;
+import io.github.zeroone3010.hue2influx.service.ServiceFactory;
+import io.github.zeroone3010.hue2influx.service.SingletonFactory;
+
 public class Hue2Influx implements Runnable {
   private final InfluxService influxService;
   private final HueService hueService;

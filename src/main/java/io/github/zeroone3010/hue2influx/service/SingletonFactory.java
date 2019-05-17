@@ -1,4 +1,6 @@
-package io.github.zeroone3010.hue2influx;
+package io.github.zeroone3010.hue2influx.service;
+
+import io.github.zeroone3010.hue2influx.Hue2InfluxConfiguration;
 
 public class SingletonFactory implements ServiceFactory {
 

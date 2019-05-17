@@ -1,14 +1,15 @@
-package io.github.zeroone3010.hue2influx;
+package io.github.zeroone3010.hue2influx.service;
 
 import static java.util.stream.Collectors.toMap;
 import java.util.Map;
 import java.util.OptionalDouble;
 
+import io.github.zeroone3010.hue2influx.Hue2InfluxConfiguration;
 import io.github.zeroone3010.yahueapi.Hue;
 import io.github.zeroone3010.yahueapi.HueBridgeProtocol;
 import io.github.zeroone3010.yahueapi.Light;
 
-public class YetAnotherHueApiService implements HueService {
+class YetAnotherHueApiService implements HueService {
   private final Hue hue;
 
   public YetAnotherHueApiService(final Hue2InfluxConfiguration configuration) {

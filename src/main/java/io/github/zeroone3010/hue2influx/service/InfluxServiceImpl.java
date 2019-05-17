@@ -1,4 +1,4 @@
-package io.github.zeroone3010.hue2influx;
+package io.github.zeroone3010.hue2influx.service;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -7,7 +7,9 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 
-public class InfluxServiceImpl implements InfluxService {
+import io.github.zeroone3010.hue2influx.Hue2InfluxConfiguration;
+
+class InfluxServiceImpl implements InfluxService {
   private Hue2InfluxConfiguration configuration;
 
   public InfluxServiceImpl(final Hue2InfluxConfiguration configuration) {

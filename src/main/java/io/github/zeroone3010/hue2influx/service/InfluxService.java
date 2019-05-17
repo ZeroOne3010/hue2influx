@@ -1,4 +1,4 @@
-package io.github.zeroone3010.hue2influx;
+package io.github.zeroone3010.hue2influx.service;
 
 import java.util.Map;
 

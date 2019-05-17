@@ -1,5 +1,8 @@
 package io.github.zeroone3010.hue2influx;
 
+import io.github.zeroone3010.hue2influx.service.HueService;
+import io.github.zeroone3010.hue2influx.service.InfluxService;
+import io.github.zeroone3010.hue2influx.service.ServiceFactory;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -10,6 +13,7 @@ import java.util.Map;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
+
 
 class Hue2InfluxTest {
   @Test
