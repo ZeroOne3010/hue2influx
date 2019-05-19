@@ -24,7 +24,7 @@ public class SingletonFactory implements ServiceFactory {
   @Override
   public InfluxService influxService() {
     if (influxService == null) {
-      influxService = new InfluxServiceImpl(configuration);
+      influxService = new InfluxServiceImpl(new InfluxDbProviderImpl(configuration));
     }
     return influxService;
   }

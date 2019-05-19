@@ -4,23 +4,18 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 
-import io.github.zeroone3010.hue2influx.Hue2InfluxConfiguration;
-
 class InfluxServiceImpl implements InfluxService {
-  private Hue2InfluxConfiguration configuration;
+  private InfluxDbProvider influxDbProvider;
 
-  public InfluxServiceImpl(final Hue2InfluxConfiguration configuration) {
-    this.configuration = configuration;
+  public InfluxServiceImpl(final InfluxDbProvider influxDbProvider) {
+    this.influxDbProvider = influxDbProvider;
   }
 
   @Override
   public void store(final Map<String, Double> brightnessByRoom) {
-    try (final InfluxDB influxDb = InfluxDBFactory
-      .connect(configuration.getInfluxUrl(), configuration.getInfluxUsername(), configuration.getInfluxPassword())
-      .setDatabase(configuration.getInfluxDatabase()).setRetentionPolicy("").enableBatch()) {
+    try (final InfluxDB influxDb = influxDbProvider.getInfluxDb()) {
       final long currentTime = System.currentTimeMillis();
       brightnessByRoom.entrySet().stream()
         .map(e -> Point.measurement("hue_measurements")
