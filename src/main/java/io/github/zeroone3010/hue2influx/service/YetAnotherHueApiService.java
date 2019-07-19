@@ -1,13 +1,14 @@
 package io.github.zeroone3010.hue2influx.service;
 
-import static java.util.stream.Collectors.toMap;
-import java.util.Map;
-import java.util.OptionalDouble;
-
 import io.github.zeroone3010.hue2influx.Hue2InfluxConfiguration;
 import io.github.zeroone3010.yahueapi.Hue;
 import io.github.zeroone3010.yahueapi.HueBridgeProtocol;
 import io.github.zeroone3010.yahueapi.Light;
+
+import java.util.Map;
+import java.util.OptionalDouble;
+
+import static java.util.stream.Collectors.toMap;
 
 class YetAnotherHueApiService implements HueService {
   private final Hue hue;
@@ -18,10 +19,12 @@ class YetAnotherHueApiService implements HueService {
 
   public YetAnotherHueApiService(final Hue hue) {
     this.hue = hue;
+    hue.setCaching(true);
   }
 
   @Override
   public Map<String, Double> getBrightnessByRoom() {
+    hue.refresh();
     return hue.getRooms().stream()
       .map(room -> new Pair(room.getName(), room.getLights().stream()
         .filter(Light::isReachable)
